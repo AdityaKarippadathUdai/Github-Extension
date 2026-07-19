@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "../Popup.module.css";
 
 export default function RepoSelector({ repositories, searchValue, onSearchChange, selectedRepo, onSelectRepo, loading, error }) {
-  const [internalSearch, setInternalSearch] = useState(searchValue);
-
   return (
     <section className={styles.card}>
       <label className={styles.label} htmlFor="repo-search">
@@ -12,12 +10,8 @@ export default function RepoSelector({ repositories, searchValue, onSearchChange
       <input
         id="repo-search"
         className={styles.input}
-        value={internalSearch}
-        onChange={(event) => {
-          const next = event.target.value;
-          setInternalSearch(next);
-          onSearchChange(next);
-        }}
+        value={searchValue}
+        onChange={(event) => onSearchChange(event.target.value)}
         placeholder="Filter repositories"
         disabled={loading}
       />

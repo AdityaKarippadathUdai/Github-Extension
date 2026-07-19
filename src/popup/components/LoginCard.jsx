@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../Popup.module.css";
 
-export default function LoginCard({ tokenRef, auth, onSaveToken }) {
+export default function LoginCard({ tokenRef, auth, error, onSaveToken, onConnected }) {
   const [value, setValue] = useState(auth.token || "");
+
+  useEffect(() => {
+    setValue(auth.token || "");
+  }, [auth.token]);
 
   return (
     <section className={styles.card}>
@@ -20,12 +24,21 @@ export default function LoginCard({ tokenRef, auth, onSaveToken }) {
           spellCheck="false"
           placeholder="Paste your Personal Access Token"
           onChange={(event) => setValue(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") onSaveToken(value);
+          onKeyDown={async (event) => {
+            if (event.key !== "Enter") return;
+            const result = await onSaveToken(value);
+            if (result?.ok) onConnected?.();
           }}
           aria-invalid={Boolean(auth.error)}
         />
-        <button className={styles.button} type="button" onClick={() => onSaveToken(value)}>
+        <button
+          className={styles.button}
+          type="button"
+          onClick={async () => {
+            const result = await onSaveToken(value);
+            if (result?.ok) onConnected?.();
+          }}
+        >
           Save
         </button>
       </div>
@@ -42,7 +55,7 @@ export default function LoginCard({ tokenRef, auth, onSaveToken }) {
         )}
       </div>
 
-      {auth.error ? <div className={styles.error}>{auth.error}</div> : null}
+      {error || auth.error ? <div className={styles.error}>{error || auth.error}</div> : null}
     </section>
   );
 }

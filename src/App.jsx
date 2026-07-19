@@ -14,9 +14,11 @@ function AppContent() {
   useEffect(() => {
     let active = true;
     (async () => {
-      await auth.bootstrap();
-      if (!active) return;
-      setReady(true);
+      try {
+        await auth.bootstrap();
+      } finally {
+        if (active) setReady(true);
+      }
     })();
     return () => {
       active = false;
@@ -38,7 +40,7 @@ function AppContent() {
 
 export default function App() {
   useEffect(() => {
-    extension.runtime?.sendMessage?.({ type: "popup_opened" }).catch?.(() => {});
+    void extension.runtime?.sendMessage?.({ type: "popup_opened" });
   }, []);
 
   return (

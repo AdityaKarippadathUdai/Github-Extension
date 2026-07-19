@@ -42,7 +42,7 @@ export default function Popup({ auth, repo, commit, ready }) {
     if (auth.authStatus === "connected" && !commitMessage && repo.recentCommitMessages.length > 0) {
       setCommitMessage(repo.recentCommitMessages[0]);
     }
-  }, [auth.authStatus]);
+  }, [auth.authStatus, commitMessage, repo.recentCommitMessages]);
 
   const repositoryOptions = useMemo(
     () => repo.repositories.filter((item) => {
@@ -67,6 +67,7 @@ export default function Popup({ auth, repo, commit, ready }) {
         <LoginCard
           tokenRef={tokenRef}
           auth={auth}
+          error={commit.fieldErrors.token}
           onSaveToken={(token) => auth.saveToken(token)}
           onConnected={() => auth.loadRepos().catch(() => {})}
         />
@@ -81,7 +82,7 @@ export default function Popup({ auth, repo, commit, ready }) {
             await repo.loadRepoBranches(nextRepo).catch(() => {});
           }}
           loading={repo.loadingRepos}
-          error={repo.error}
+          error={commit.fieldErrors.repository || repo.error}
         />
 
         <BranchSelector
@@ -90,6 +91,7 @@ export default function Popup({ auth, repo, commit, ready }) {
           loading={repo.loadingBranches}
           onSelectBranch={repo.setSelectedBranch}
           onReload={() => repo.loadRepoBranches().catch(() => {})}
+          error={commit.fieldErrors.branch || repo.error}
         />
 
         <FilePathInput

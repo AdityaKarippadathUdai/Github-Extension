@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../Popup.module.css";
 
-export default function BranchSelector({ branches, selectedBranch, loading, onSelectBranch, onReload }) {
+export default function BranchSelector({ branches, selectedBranch, loading, onSelectBranch, onReload, error }) {
   return (
     <section className={styles.card}>
       <div className={styles.rowBetween}>
@@ -27,6 +27,7 @@ export default function BranchSelector({ branches, selectedBranch, loading, onSe
         ))}
       </select>
       {loading ? <div className={styles.helper}>Loading branches...</div> : null}
+      {error ? <div className={styles.error}>{error}</div> : null}
     </section>
   );
 }
