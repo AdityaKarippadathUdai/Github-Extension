@@ -12,6 +12,7 @@ export function RepoProvider({ children }) {
     selectedRepo: auth.selectedRepo,
     selectedBranch: auth.selectedBranch,
     filePath: auth.filePath,
+    searchQuery: auth.searchQuery,
     recentRepositories: auth.recentRepositories,
     recentCommitMessages: auth.recentCommitMessages,
     loadingRepos: auth.loadingRepos,
@@ -21,6 +22,7 @@ export function RepoProvider({ children }) {
     setSelectedRepo: auth.selectRepo,
     setSelectedBranch: auth.selectBranch,
     setFilePath: auth.saveFilePath,
+    setSearchQuery: auth.setSearchQuery,
     loadRepos: auth.loadRepos,
     loadRepoBranches: auth.loadRepoBranches,
     rememberCommitMessage: auth.rememberCommitMessage
