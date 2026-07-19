@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { loadUserRepositories, validateToken as validateGithubToken } from "../services/auth.js";
 import { loadBranches } from "../services/repoService.js";
 import { MAX_RECENT_ITEMS, STORAGE_KEYS } from "../utils/constants.js";
@@ -15,6 +15,7 @@ export function useGithubBridge() {
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [selectedBranch, setSelectedBranch] = useState("");
   const [filePath, setFilePath] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [recentRepositories, setRecentRepositories] = useState([]);
   const [recentCommitMessages, setRecentCommitMessages] = useState([]);
   const [loadingRepos, setLoadingRepos] = useState(false);
@@ -34,12 +35,16 @@ export function useGithubBridge() {
 
     if (stored[STORAGE_KEYS.token]) setToken(stored[STORAGE_KEYS.token]);
     if (stored[STORAGE_KEYS.user]) setUser(stored[STORAGE_KEYS.user]);
+    if (stored[STORAGE_KEYS.lastRepo]) setSelectedRepo(stored[STORAGE_KEYS.lastRepo]);
+    if (stored[STORAGE_KEYS.lastBranch]) setSelectedBranch(stored[STORAGE_KEYS.lastBranch]);
     if (stored[STORAGE_KEYS.lastFilePath]) setFilePath(stored[STORAGE_KEYS.lastFilePath]);
     if (Array.isArray(stored[STORAGE_KEYS.recentRepos])) setRecentRepositories(stored[STORAGE_KEYS.recentRepos]);
     if (Array.isArray(stored[STORAGE_KEYS.recentMessages])) setRecentCommitMessages(stored[STORAGE_KEYS.recentMessages]);
 
     return stored;
   }, []);
+
+  const bootstrap = hydrate;
 
   const saveToken = useCallback(async (nextToken) => {
     const value = nextToken.trim();
@@ -89,6 +94,10 @@ export function useGithubBridge() {
     try {
       const repos = await loadUserRepositories(token);
       setRepositories(repos);
+      if (selectedRepo?.full_name) {
+        const match = repos.find((repo) => repo.full_name === selectedRepo.full_name);
+        if (match) setSelectedRepo(match);
+      }
       return repos;
     } catch (cause) {
       setError(cause?.message || "Unable to load repositories.");
@@ -96,7 +105,7 @@ export function useGithubBridge() {
     } finally {
       setLoadingRepos(false);
     }
-  }, [token]);
+  }, [token, selectedRepo?.full_name]);
 
   const selectRepo = useCallback(
     async (repo) => {
@@ -153,6 +162,10 @@ export function useGithubBridge() {
     });
   }, []);
 
+  const saveSearchQuery = useCallback((nextQuery) => {
+    setSearchQuery(nextQuery);
+  }, []);
+
   const rememberCommitMessage = useCallback(async (message) => {
     const current = dedupeRecent(recentCommitMessages, message, MAX_RECENT_ITEMS);
     setRecentCommitMessages(current);
@@ -160,10 +173,6 @@ export function useGithubBridge() {
       [STORAGE_KEYS.recentMessages]: current
     });
   }, [recentCommitMessages]);
-
-  useEffect(() => {
-    hydrate().catch(() => {});
-  }, [hydrate]);
 
   return useMemo(
     () => ({
@@ -175,6 +184,7 @@ export function useGithubBridge() {
       selectedRepo,
       selectedBranch,
       filePath,
+      searchQuery,
       recentRepositories,
       recentCommitMessages,
       loadingRepos,
@@ -187,6 +197,7 @@ export function useGithubBridge() {
       setSelectedRepo,
       setSelectedBranch,
       setFilePath,
+      setSearchQuery: saveSearchQuery,
       saveToken,
       logout,
       loadRepos,
@@ -194,7 +205,8 @@ export function useGithubBridge() {
       loadRepoBranches,
       selectBranch,
       saveFilePath,
-      rememberCommitMessage
+      rememberCommitMessage,
+      bootstrap
     }),
     [
       token,
@@ -205,6 +217,7 @@ export function useGithubBridge() {
       selectedRepo,
       selectedBranch,
       filePath,
+      searchQuery,
       recentRepositories,
       recentCommitMessages,
       loadingRepos,
@@ -217,7 +230,8 @@ export function useGithubBridge() {
       loadRepoBranches,
       selectBranch,
       saveFilePath,
-      rememberCommitMessage
+      rememberCommitMessage,
+      bootstrap
     ]
   );
 }

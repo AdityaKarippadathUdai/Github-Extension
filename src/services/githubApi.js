@@ -50,7 +50,7 @@ export async function request(path, { method = "GET", token, body, headers = {},
       timeoutError.code = "timeout";
       throw timeoutError;
     }
-    if (!navigator.onLine) {
+    if (!navigator.onLine || error instanceof TypeError) {
       const offlineError = new Error("Connection lost. Check your network and try again.");
       offlineError.code = "offline";
       throw offlineError;
