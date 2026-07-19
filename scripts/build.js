@@ -30,9 +30,20 @@ function writeManifest(outDir, browserTarget) {
   );
 }
 
+function normalizePopupHtml(outDir) {
+  const source = path.join(outDir, "public", "popup.html");
+  const target = path.join(outDir, "popup.html");
+  if (fs.existsSync(source)) {
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.renameSync(source, target);
+  }
+  fs.rmSync(path.join(outDir, "public"), { recursive: true, force: true });
+}
+
 async function buildOnce(outDir) {
   await build({
     configFile: path.resolve("vite.config.js"),
+    mode: "production",
     build: {
       outDir
     }
@@ -49,6 +60,7 @@ async function main() {
   if (target === "chrome") {
     await buildOnce(chromeDir);
     copyDir(path.resolve("public/icons"), path.join(chromeDir, "icons"));
+    normalizePopupHtml(chromeDir);
     writeManifest(chromeDir, "chrome");
     return;
   }
@@ -56,15 +68,18 @@ async function main() {
   if (target === "firefox") {
     await buildOnce(firefoxDir);
     copyDir(path.resolve("public/icons"), path.join(firefoxDir, "icons"));
+    normalizePopupHtml(firefoxDir);
     writeManifest(firefoxDir, "firefox");
     return;
   }
 
   await buildOnce(chromeDir);
   copyDir(path.resolve("public/icons"), path.join(chromeDir, "icons"));
+  normalizePopupHtml(chromeDir);
   writeManifest(chromeDir, "chrome");
 
   copyDir(chromeDir, firefoxDir);
+  normalizePopupHtml(firefoxDir);
   writeManifest(firefoxDir, "firefox");
 }
 

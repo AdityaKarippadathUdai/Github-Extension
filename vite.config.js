@@ -13,10 +13,14 @@ export default defineConfig(() => {
       target: "es2020",
       rollupOptions: {
         input: {
-          popup: path.resolve(__dirname, "public/popup.html")
+          popup: path.resolve(__dirname, "public/popup.html"),
+          background: path.resolve(__dirname, "src/background/background.js")
         },
         output: {
-          entryFileNames: "assets/[name]-[hash].js",
+          entryFileNames: (chunk) => {
+            if (chunk.name === "background") return "assets/background.js";
+            return "assets/[name]-[hash].js";
+          },
           chunkFileNames: "assets/[name]-[hash].js",
           assetFileNames: "assets/[name]-[hash][extname]"
         }

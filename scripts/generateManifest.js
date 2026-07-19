@@ -9,12 +9,7 @@ export function generateManifest(targetBrowser) {
   const basePath = path.resolve("public/manifest.base.json");
   const base = readJson(basePath);
 
-  const manifest = {
-    ...base,
-    browser_action: undefined
-  };
-
-  delete manifest.browser_action;
+  const manifest = { ...base };
 
   if (targetBrowser === "firefox") {
     manifest.browser_specific_settings = {
