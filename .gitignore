@@ -1,3 +1,6 @@
 node_modules
 dist-chrome/
 dist-firefox/
+github-commit-extension-firefox.xpi
+dist-chrome.pem
+dist-chrome.crx
