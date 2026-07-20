@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Commit Extension",
+  "description": "Create and update GitHub files directly from a browser popup.",
+  "version": "1.0.0",
+  "action": {
+    "default_title": "GitHub Commit Extension",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.github.com/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
